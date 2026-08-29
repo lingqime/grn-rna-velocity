@@ -1,32 +1,50 @@
-# RPE1 data inputs
+# RPE1 external data
 
-Large biological data files are intentionally not committed to GitHub.
+Large biological data and historical binary checkpoints are intentionally not
+committed to GitHub.
 
-The original notebook used the following upstream inputs:
+Use the following local layout:
 
-- `Replogle_Saunders_PerturbRPE1_All_75cutoff_QC.h5ad`
-- `Replogle_Saunders_PerturbRPE1_All_75cutoff_QC_MedGeneSet_Filtered.h5ad`
-- `PerturbRPE1_NT_CCKO_MedGeneSet_cycle_cell_phase_1harm_metadata.csv.gz`
-- the official 986-condition VeloCycle LargeGene result pickle
-- compact VeloCycle extracts produced from that pickle
-- `replogle_grn_checkpoint.npz`, an intermediate historical checkpoint that
-  stores the 154-condition pre-final-phase-QC panel.
+```text
+data/
+├── raw/
+│   ├── Replogle_Saunders_PerturbRPE1_All_75cutoff_QC.h5ad
+│   ├── Replogle_Saunders_PerturbRPE1_All_75cutoff_QC_MedGeneSet_Filtered.h5ad
+│   └── PerturbRPE1_NT_CCKO_MedGeneSet_cycle_cell_phase_1harm_metadata.csv.gz
+└── processed/
+    ├── velocycle_986_official_extract.npz
+    ├── velocycle_986_latent_extract.npz
+    └── replogle_grn_checkpoint.npz
+```
 
-## Important provenance limitation
+## What the uploaded analysis notebook recovers exactly
 
-The uploaded notebook contains the exact first two perturbation QC thresholds:
+The notebook records two explicit perturbation-QC filters:
 
-1. at least 150 cells per perturbation;
-2. non-targeting mean spliced expression >= 0.1 and mean unspliced expression >= 0.02.
+1. at least 150 cells per perturbation, reducing 985 measured perturbation
+   targets to 286;
+2. non-targeting mean spliced expression >= 0.1 and mean unspliced expression
+   >= 0.02 for the target gene, reducing 286 to 165 perturbations.
 
-These reduce 985 perturbation targets to 286 and then 165 targets. The notebook
-then restores a 153-perturbation intermediate panel from
-`replogle_grn_checkpoint.npz`. The bytes of that historical checkpoint are not
-contained in the notebook, so the exact 165 -> 153 intermediate filtering step
-cannot be reconstructed from this repository alone unless that checkpoint or
-the earlier preprocessing code is recovered.
+The notebook then restores a 153-perturbation intermediate panel from
+`replogle_grn_checkpoint.npz`. The notebook does not contain the bytes or the
+complete earlier code that produced the 165 -> 153 reduction, so this step
+remains the only unresolved condition-selection provenance gap.
 
-Using the official VeloCycle phase, the final phase-coverage filter removes
-`NPLOC4` and `TRAPPC11`, leaving 151 perturbations plus non-targeting control.
+The final VeloCycle phase-coverage filter removes `NPLOC4` and `TRAPPC11`,
+leaving 151 perturbations plus the non-targeting control.
 
-Do not commit the large H5AD or VeloCycle pickle files directly to GitHub.
+## VeloCycle compact extracts
+
+`velocycle_986_official_extract.npz` stores the official cell phase,
+condition-specific speed, and log-beta/log-gamma arrays used downstream.
+
+`velocycle_986_latent_extract.npz` stores the Fourier coefficients and related
+latent quantities needed to reconstruct the 10-bin VeloCycle phase template.
+
+The historical deserialization helper for the original VeloCycle pickle is kept
+under `archive/legacy_velocycle_latent_extract.py`. It is not a canonical public
+entry point because it relied on a legacy environment.
+
+Do not commit H5AD files, the original large VeloCycle pickle, or large NPZ
+checkpoints directly to GitHub.

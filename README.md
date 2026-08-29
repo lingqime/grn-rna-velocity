@@ -59,10 +59,11 @@ grn-rna-velocity/
 
 ## Status of the extraction
 
-The stage scripts are faithful extracts of the code that produced the final
-analysis, with notebook cell numbers preserved in comments. They are intended
-to make the analysis readable and auditable without hiding the exploratory
-history.
+The stage scripts are faithful, cleaned extracts of the code that produced the
+final analysis, with notebook cell numbers preserved in comments. Machine-
+specific paths have been removed from the canonical scripts. Because the
+original computation was a sequential notebook, the numbered stage files share
+the namespace created by earlier stages; see `experiments/rpe1/README.md`.
 
 The original notebook is still the canonical provenance record. A completely
 fresh raw-data rerun has one known provenance gap: the notebook restores a
@@ -108,9 +109,11 @@ retained under `archive/`.
 
 ## Data
 
-Large H5AD and VeloCycle pickle files are not stored in Git. See
+Large H5AD and VeloCycle pickle files are not stored in Git. Canonical scripts
+use repository-local `data/raw/` and `data/processed/` paths. See
 `data/README.md` for expected inputs and the known intermediate-checkpoint
-provenance limitation.
+provenance limitation. Additional recovered details are recorded in
+`PROVENANCE.md`.
 
 ## Reproducing figures from frozen outputs
 
@@ -136,7 +139,6 @@ Before making the GitHub repository public:
 
 - recover and document the historical 165 -> 153 intermediate filtering step
   if possible;
-- replace machine-specific paths in any script you intend readers to execute;
 - add the public data/Zenodo links to `data/README.md`;
 - choose and add a software license;
 - add `CITATION.cff` once the manuscript author list/DOI are final;

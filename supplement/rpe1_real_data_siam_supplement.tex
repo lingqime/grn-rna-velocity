@@ -37,11 +37,7 @@ The VeloCycle processing provides a cell-cycle phase estimate for each cell, con
 
 The VeloCycle-processed RPE1 dataset contains a substantially larger perturbation panel than the one used in the final reconstruction. The complete processed object contains 985 measured perturbation targets. The final analysis retains 151 perturbation targets together with the non-targeting control, giving 152 experimental conditions and approximately 57,172 retained cells. All trajectory construction, identifiability calculations, sparse reconstructions, stability analyses, and held-out evaluations reported below use this fixed condition set.
 
-The exact upstream perturbation- and cell-level quality-control criteria used to obtain the final 151-target panel should be preserved together with the original preprocessing workflow. The numerical record available for the present supplement identifies the final panel and retained cell set but does not by itself recover every upstream filtering rule with sufficient certainty to state those rules here without qualification.
-
-% TODO before final archival release, if the original preprocessing notebook is recovered:
-% record the exact perturbation- and cell-level QC criteria used to obtain
-% the final 151-target panel from the full 985-target processed dataset.
+The recovered preprocessing notebook records two explicit perturbation-level filters. First, perturbation targets represented by fewer than 150 cells are removed, reducing the 985 measured perturbation targets to 286. Second, targets are required to have non-targeting mean spliced expression at least \(0.1\) and mean unspliced expression at least \(0.02\), reducing the panel to 165 perturbations. The notebook subsequently restores a 153-perturbation intermediate panel from a saved analysis checkpoint; the exact earlier filtering step responsible for the reduction from 165 to 153 perturbations is not represented in the recovered notebook and is therefore not reconstructed here. The final VeloCycle phase-coverage filter removes two additional perturbations, \texttt{NPLOC4} and \texttt{TRAPPC11}, leaving the 151-target panel used in the reported analysis.
 
 \section{Final analysis population}
 
@@ -89,13 +85,18 @@ where \(a_g^{(q)}\) denotes the condition-specific non-targeting-relative expres
 
 The corresponding unspliced response trajectory is derived using the VeloCycle kinetic parameters and condition-specific phase-speed representation so that the spliced and unspliced trajectories are internally consistent with the fitted RNA-velocity dynamics. Thus, the response-side construction shares a common VeloCycle-derived phase structure across conditions with condition-specific amplitude modulation. This feature is important for interpreting the phase-only validation baseline because part of the response representation is itself strongly phase structured.
 
-The retained numerical record establishes the trajectory dimensions, the VeloCycle phase profile, the non-targeting-relative amplitude construction, and the kinetic consistency of the unspliced trajectory. If the original preprocessing implementation is recovered, the exact transformation defining \(a_g^{(q)}\), including any pseudocount and normalization constants, should be archived together with this supplement rather than reconstructed from memory.
-
-% TODO before final archival release, if the original preprocessing notebook is recovered:
-% insert the exact formula for the NT-relative raw-spliced log-fold-change
-% amplitude, including pseudocount/normalization constants, and the exact
-% algebraic formula used to obtain the unspliced trajectory from the
-% VeloCycle kinetic and phase-speed quantities.
+For each condition \(q\), phase bin \(b\), and response gene \(g\), let \(\overline S_{g,b}^{(q)}\) denote the mean raw spliced count among cells in that condition--phase bin. With pseudocount \(0.1\), the condition-specific amplitude shift is
+\[
+\delta_g^{(q)}
+=
+\operatorname{median}_{b\in\mathcal B_q}
+\left\{
+\log\!\left(\overline S_{g,b}^{(q)}+0.1\right)
+-
+\log\!\left(\overline S_{g,b}^{(\mathrm{NT})}+0.1\right)
+\right\},
+\]
+where \(\mathcal B_q\) contains bins having at least five cells in both condition \(q\) and the non-targeting control. The final spliced response trajectory is the common VeloCycle one-harmonic phase template multiplied by \(\exp(\delta_g^{(q)})\). This makes the condition dependence an NT-relative raw-spliced amplitude modulation of the VeloCycle phase shape.
 
 \section{Regulator trajectories}
 
@@ -173,13 +174,7 @@ A common regularization level is used across the primary reconstruction and the 
 \lambda=0.03665241237079626.
 \]
 
-The retained numerical record establishes the final calibration-gene count and selected regularization value but does not contain sufficient information to reconstruct with certainty the complete candidate-\(\lambda\) grid and selection criterion used in the original calibration step. These details should be recovered from the original calibration workflow if an exact end-to-end rerun is required.
-
-% TODO before final archival release, if the original calibration notebook is recovered:
-% record the identities/selection rule for the 31 calibration genes,
-% the candidate lambda grid, the validation criterion, and the rule used
-% to select lambda = 0.03665241237079626.
-
+The recovered calibration code uses the fixed 31-gene panel listed in the accompanying repository configuration. Candidate penalties are \(\lambda\in\operatorname{logspace}(-4,0,40)\). For each calibration gene, perturbation conditions are split into five folds with shuffling and random seed 2026, while the non-targeting condition is always retained in training. For every candidate \(\lambda\), the exact-integral model is fit using training-only FWL projection and RMS scaling, and held-out error is measured relative to the basal-only integral model. The selected global penalty minimizes the mean relative held-out mean-squared error across the 31 calibration genes, with equal weight per gene. The historical rule by which these 31 genes were originally chosen as the fixed calibration panel is not represented in the recovered notebook; their identities, however, are exactly preserved.
 \section{Primary reconstructed network}
 
 The primary regulatory matrix has dimension

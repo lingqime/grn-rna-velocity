@@ -33,3 +33,9 @@ figures/**/*.png
 .DS_Store
 .vscode/
 .idea/
+
+# External data directories: keep directory placeholders, ignore contents
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep

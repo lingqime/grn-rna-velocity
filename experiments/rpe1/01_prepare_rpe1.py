@@ -31,29 +31,39 @@ import h5py
 import matplotlib.pyplot as plt
 import psutil
 
-# Project directory
-base_dir = Path("/home/featurize/work/project1")
+# Repository-local data locations.
+# Large external inputs are not committed to Git; see data/README.md.
+from src.paths import RAW_DIR, PROCESSED_DIR, require_file
 
-# Main RPE1 dataset
-full_h5ad = (
-    base_dir /
-    "Replogle_Saunders_PerturbRPE1_All_75cutoff_QC.h5ad"
+base_dir = RAW_DIR
+
+full_h5ad = require_file(
+    RAW_DIR / "Replogle_Saunders_PerturbRPE1_All_75cutoff_QC.h5ad",
+    "full RPE1 AnnData",
 )
 
-# 120-gene VeloCycle dataset
-med_h5ad = (
-    base_dir /
-    "Replogle_Saunders_PerturbRPE1_All_75cutoff_QC_MedGeneSet_Filtered.h5ad"
+med_h5ad = require_file(
+    RAW_DIR / "Replogle_Saunders_PerturbRPE1_All_75cutoff_QC_MedGeneSet_Filtered.h5ad",
+    "VeloCycle MedGeneSet AnnData",
 )
 
-# VeloCycle phase metadata
-phase_metadata = (
-    base_dir /
-    "PerturbRPE1_NT_CCKO_MedGeneSet_cycle_cell_phase_1harm_metadata.csv.gz"
+phase_metadata = require_file(
+    RAW_DIR / "PerturbRPE1_NT_CCKO_MedGeneSet_cycle_cell_phase_1harm_metadata.csv.gz",
+    "VeloCycle phase metadata",
 )
 
-# Our previous compact checkpoint
-checkpoint_path = base_dir / "replogle_grn_checkpoint.npz"
+checkpoint_path = require_file(
+    PROCESSED_DIR / "replogle_grn_checkpoint.npz",
+    "historical 154-condition GRN checkpoint",
+)
+
+# Compact official VeloCycle speed/phase/kinetic extract.
+# In the notebook this variable was created in a historical environment-
+# recovery cell; it is explicit here.
+extract_path = require_file(
+    PROCESSED_DIR / "velocycle_986_official_extract.npz",
+    "compact official VeloCycle extract",
+)
 
 print("Project directory:", base_dir)
 print()
@@ -572,7 +582,10 @@ print(speed_qc[speed_qc < 0].sort_values())
 
 import numpy as np
 
-checkpoint_path = base_dir / "replogle_grn_checkpoint.npz"
+checkpoint_path = require_file(
+    PROCESSED_DIR / "replogle_grn_checkpoint.npz",
+    "historical 154-condition GRN checkpoint",
+)
 
 ckpt = np.load(
     checkpoint_path,

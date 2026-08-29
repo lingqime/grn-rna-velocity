@@ -620,10 +620,11 @@ print(
 import numpy as np
 import os
 
+from src.paths import RESULTS_DIR
 
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 final_checkpoint_v2_path = (
-    "/home/featurize/work/project1/"
-    "replogle_final_exact_integral_grn_v2.npz"
+    RESULTS_DIR / "replogle_final_exact_integral_grn_v2.npz"
 )
 
 
