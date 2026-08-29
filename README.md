@@ -4,6 +4,21 @@ Code and technical provenance for the perturbation-resolved RPE1 analysis used
 in the manuscript *Decoding Gene Regulatory Networks from Single-Cell RNA
 Velocity*.
 
+
+## Reproducibility status
+
+This repository preserves the complete original analysis notebook and a cleaned,
+stage-oriented representation of the final RPE1 workflow. The final numerical
+analysis and manuscript-level settings are recoverable from the notebook.
+However, a fresh raw-data-to-final-network rerun still requires one historical
+intermediate checkpoint because the exact code for the 165 -> 153 perturbation
+filter is absent from the recovered notebook. This limitation is documented
+explicitly in `PROVENANCE.md`; no missing filtering rule has been guessed.
+
+The numbered RPE1 scripts are therefore intended as readable and auditable
+research code matching the final analysis, while
+`archive/Replogle_cloud.ipynb` remains the exact execution-provenance record.
+
 ## What this repository contains
 
 The uploaded analysis consisted of one 134-cell Jupyter notebook,
@@ -93,6 +108,18 @@ No missing preprocessing rule has been guessed or silently reconstructed.
 The parameter file `configs/rpe1.yaml` records these settings and the fixed
 31-gene alpha-calibration panel.
 
+## Upstream data and software
+
+The real-data analysis uses RPE1 Perturb-seq/VeloCycle materials released with:
+
+- Lederer et al., *Statistical inference with a manifold-constrained RNA
+  velocity model uncovers cell cycle speed modulations*, Nature Methods 21,
+  2271--2286 (2024), DOI: https://doi.org/10.1038/s41592-024-02471-8
+- VeloCycle source: https://github.com/lamanno-epfl/velocycle
+- VeloCycle publication materials: https://doi.org/10.5281/zenodo.12517650
+
+See `data/README.md` for the local file layout and data-provenance notes.
+
 ## Installation
 
 A minimal reconstruction/figure environment can be created with:
@@ -133,13 +160,14 @@ The SIAM supplementary-material source is included in `supplement/` and records
 the real-data construction, estimator, identifiability, stability, validation,
 and reproducibility details.
 
-## Public release checklist
+## Before changing this repository from private to public
 
-Before making the GitHub repository public:
+Two metadata decisions are intentionally left to the repository owner rather
+than guessed during code packaging:
 
-- recover and document the historical 165 -> 153 intermediate filtering step
-  if possible;
-- add the public data/Zenodo links to `data/README.md`;
-- choose and add a software license;
-- add `CITATION.cff` once the manuscript author list/DOI are final;
-- optionally archive large frozen result files on Zenodo rather than GitHub.
+- choose and add the software license;
+- add the final manuscript citation/author metadata (for example in
+  `CITATION.cff`) once the author list and manuscript identifier are confirmed.
+
+The unresolved 165 -> 153 condition-selection provenance gap should remain
+disclosed unless the historical checkpoint-generation code is recovered.

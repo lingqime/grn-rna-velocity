@@ -3,7 +3,23 @@
 Large biological data and historical binary checkpoints are intentionally not
 committed to GitHub.
 
-Use the following local layout:
+## Upstream sources
+
+The RPE1 Perturb-seq/VeloCycle analysis used here is based on the VeloCycle
+publication and its released analysis materials:
+
+- VeloCycle article: https://doi.org/10.1038/s41592-024-02471-8
+- VeloCycle source code: https://github.com/lamanno-epfl/velocycle
+- VeloCycle publication materials: https://doi.org/10.5281/zenodo.12517650
+
+The VeloCycle paper describes the genome-wide RPE1 Perturb-seq application,
+including filtering perturbed cells to retain complete target knockdown and
+condition-specific velocity learning.
+
+## Local file layout
+
+After obtaining the upstream data/materials, the cleaned analysis scripts expect
+the following local layout:
 
 ```text
 data/
@@ -17,7 +33,11 @@ data/
     └── replogle_grn_checkpoint.npz
 ```
 
-## What the uploaded analysis notebook recovers exactly
+The exact filenames above are the filenames used by the recovered analysis
+notebook. Upstream archives may organize or name files differently; do not
+rename or overwrite upstream source files without preserving their provenance.
+
+## What the recovered notebook establishes exactly
 
 The notebook records two explicit perturbation-QC filters:
 
@@ -28,8 +48,8 @@ The notebook records two explicit perturbation-QC filters:
 
 The notebook then restores a 153-perturbation intermediate panel from
 `replogle_grn_checkpoint.npz`. The notebook does not contain the bytes or the
-complete earlier code that produced the 165 -> 153 reduction, so this step
-remains the only unresolved condition-selection provenance gap.
+complete earlier code that produced the 165 -> 153 reduction, so this remains
+the one unresolved condition-selection provenance gap.
 
 The final VeloCycle phase-coverage filter removes `NPLOC4` and `TRAPPC11`,
 leaving 151 perturbations plus the non-targeting control.
@@ -46,5 +66,8 @@ The historical deserialization helper for the original VeloCycle pickle is kept
 under `archive/legacy_velocycle_latent_extract.py`. It is not a canonical public
 entry point because it relied on a legacy environment.
 
+## Files intentionally excluded from Git
+
 Do not commit H5AD files, the original large VeloCycle pickle, or large NPZ
-checkpoints directly to GitHub.
+checkpoints directly to GitHub. If frozen numerical outputs are released, a
+versioned archival service such as Zenodo is preferable for the large files.
