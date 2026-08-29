@@ -1,0 +1,135 @@
+notebook_index,cell_title,lines
+0,Cell 1. Imports and project paths,51
+1,Cell 2. Load full RPE1 AnnData,24
+2,Cell 3. Check spliced/unspliced and conditions,33
+3,Cell 4. First perturbation QC: cell count,30
+4,Cell 5. Second perturbation QC:,66
+5,Cell 6. Verify target suppression,69
+6,Cell 7. Define conditions and perturbation operators M_q,62
+7,Cell 8. Load official VeloCycle phase metadata,18
+8,Cell 9. Match official phase metadata to full AnnData,43
+9,Cell 10. Inspect VeloCycle MedGeneSet,30
+10,Cell 11. Locate official 986-condition,27
+11,Cell 12. Check VeloCycle dependencies,29
+12,Cell 13. Clone official VeloCycle repository,40
+13,Cell 14. Create isolated official VeloCycle env,59
+14,Cell 15. Resolve official VeloCycle env path,33
+15,Cell 16. Install core official VeloCycle stack,37
+16,Cell 17b. Test VeloCycle directly from source,51
+17,Cell 18b. Install missing VeloCycle,33
+18,Cell 19. Re-test VeloCycle import,50
+19,Cell 20. Install missing IPython dependency,23
+20,Cell 21. Final VeloCycle import check,35
+21,Cell 22. Inspect VeloCycle git history,40
+22,Cell 23. Syntax-check historical versions,46
+23,Cell 24. Create a clean VeloCycle worktree,48
+24,Cell 25. Test import using legacy VeloCycle source,38
+25,Cell 26. Load official 986-condition pickle,94
+26,"Cell 27. Inspect phase, speed, and kinetics",107
+27,Cell 28. Understand official phase representation,24
+28,Cell 29b. Validate full VeloCycle phase,135
+29,Cell 30. Check phase consistency between,105
+30,Cell 31. Export compact official VeloCycle,134
+31,Cell 32. Inspect AngularSpeed parameterization,42
+32,Cell 33. Inspect VeloCycle speed estimates,57
+33,Cell 33b. Recover final perturbation list,26
+34,Cell 34. Restore final perturbations,51
+35,Cell 35. Check kinetics coverage for the,48
+36,Cell 36. Check the 426 VeloCycle kinetic genes,42
+37,Cell 37. NT expression QC for the 426,95
+38,Cell 38. Inspect VeloCycle normalization,45
+39,Cell 39. Verify how VeloCycle n_scounts /,71
+40,Cell 40. Test whether VeloCycle n_scounts /,53
+41,Cell 41. Attach official VeloCycle phase,109
+42,Cell 42. Freeze final condition set under,59
+43,Cell 43. Put VeloCycle speed and kinetics,82
+44,Cell 44. Build VeloCycle-normalized sparse,140
+45,Cell 45. Build final binned trajectories,158
+46,Cell 46. Build interval-level design matrix X,148
+47,Cell 47. Build integral-response matrix Y,168
+48,Cell 48. Build spliced trajectories for the,122
+49,Cell 49. Kinetic consistency check using,189
+50,Cell 50. Inspect exact VeloCycle kinetic,71
+51,Cell 51. Inspect the exact preprocessing /,41
+52,Cell 52. Re-check VeloCycle kinetics,149
+53,Cell 52b. Inspect interval_rows structure,22
+54,Cell 52c. Build RAW-count trajectories,134
+55,Cell 53. Kinetic consistency check,192
+56,Cell 54. Diagnose VeloCycle's global,148
+57,Cell 55. Audit kinetic variables directly,111
+58,Cell 56. Inspect compact checkpoint contents,42
+59,Cell 57. Locate where VeloCycle stores,50
+60,Cell 58. Extract compact latent VeloCycle,256
+61,Cell 59. Inspect exact count_factor,33
+62,Cell 60. Inspect the exact Fourier basis,62
+63,Cell 61. Exact latent kinetic identity check,308
+64,Cell 62. Build VeloCycle latent trajectories,184
+65,Cell 62b. Restore fixed 10-bin phase grid,29
+66,Cell 63. Build VeloCycle latent trajectories,169
+67,Cell 64. Reconstruct the exact VeloCycle,79
+68,Cell 65. Estimate condition-specific,224
+69,Cell 66. Estimate perturbation-specific,187
+70,Cell 67. Build perturbation-specific,123
+71,Cell 68. Build perturbation-specific,163
+72,Cell 69. Build raw spliced trajectories,159
+73,Cell 70. Circular Fourier smoothing of,226
+74,Cell 71. Build FINAL integral design matrix X,219
+75,Cell 72. Build FINAL integral response Y,205
+76,Cell 73. Numerical rank and conditioning,143
+77,Cell 74. Perturbation-assisted identifiability:,183
+78,Cell 75. Random-order robustness of,225
+79,Cell 76. Build gene-specific valid-row masks,139
+80,Cell 77. Prepare condition-grouped CV,182
+81,Cell 78. Grouped-CV Lasso for TACC3,230
+82,Cell 79. Final refit for TACC3,213
+83,Cell 80. Inspect response-rate scale,140
+84,Cell 81. TACC3 grouped CV with BOTH,232
+85,Cell 82. Build a representative response-gene,119
+86,Cell 83. Calibrate dimensionless alpha,309
+87,Cell 84. Select one global dimensionless,173
+88,Cell 85. Reconstruct the full 426 x 151 GRN,302
+89,Cell 86. Strict held-out perturbation,327
+90,Cell 87. Full 426-gene perturbation-held-out,409
+91,Cell 88. Save reconstruction + OOF checkpoint,131
+92,Cell 89. TACC3 condition-permutation null,356
+93,Cell 90. Phase-only null for all 426 genes,311
+94,Cell 91. Residualize shared phase structure,223
+95,Cell 92. Strict cross-fitted phase-residual,384
+96,Cell 93. Full 426-gene cross-fitted,397
+97,Cell 94. Recalibrate alpha for the,326
+98,Cell 94b. Restore the fixed 31-gene,70
+99,Cell 94c. Calibrate alpha for the,415
+100,Cell 95. Final phase-residualized OOF,503
+101,Cell 96. Exact integral-objective prototype,317
+102,Cell 97. Alpha calibration for the EXACT,482
+103,Cell 98. FINAL exact-integral GRN fit,427
+104,Cell 99. Save FINAL exact-integral GRN,192
+105,Cell 100. Correct identifiability design,227
+106,Cell 101. Correct randomized perturbation,360
+107,Cell 102. Save corrected identifiability,247
+108,Cell 103. Pilot edge-stability analysis,439
+109,Cell 104. Full edge-stability analysis,511
+110,Cell 105. Save full edge-stability results,330
+111,Cell 106. Build final edge-level table,313
+112,Cell 107. Regulator-level network summary,323
+113,Cell 108. Regulator hub confounding diagnostic,282
+114,Cell 109. Regulator-feature redundancy,289
+115,Cell 110. Diagnose the 12 possible self-edges,272
+116,Cell 111. Diagnose self-signal coupling,253
+117,Cell 112. Refit the 12 overlap response genes,522
+118,Cell 113. Update stability for the 12,579
+119,Cell 114. Freeze corrected primary network,389
+120,Cell 115. Save corrected primary GRN,212
+121,Cell 116. Prepare condition-held-out CV,314
+122,Cell 117. Exact-integral condition-held-out,513
+123,Cell 118. Verify OOF missing-entry accounting,239
+124,Cell 119. Primary held-out validation,379
+125,Cell 120. Diagnose the negative held-out result,300
+126,Cell 121. Diagnose pooled SSE improvement,282
+127,Cell 122. Held-out regulator feature,292
+128,Cell 123. Decompose regulator trajectories,399
+129,Cell 124. Freeze final numerical-experiment,527
+130,Cell 125. FINAL kernel-shutdown checkpoint,319
+131,Notebook cell 131,0
+132,Notebook cell 132,0
+133,Notebook cell 133,0

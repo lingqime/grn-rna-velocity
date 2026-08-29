@@ -1,0 +1,375 @@
+% SIAM Supplemental File
+\documentclass[supplement,onefignum,onetabnum]{siamart251216}
+
+% Shared packages, macros, theorem definitions, and author metadata used by the main article.
+\input{ex_shared}
+\usepackage{booktabs}
+
+% Replace ex_article by the basename of the compiled main-article .aux file if needed.
+\externaldocument[][nocite]{ex_article}
+
+% Optional PDF information
+\ifpdf
+\hypersetup{
+  pdftitle={Supplementary Materials: Technical Details of the RPE1 Perturb-seq Real-Data Analysis},
+  pdfauthor={}
+}
+\fi
+
+\begin{document}
+
+\maketitle
+
+\section{Purpose and scope}
+\label{sec:supp-rpe1}
+
+This supplement provides detailed documentation of the real-data processing, trajectory construction, reconstruction, and validation procedures used for the RPE1 Perturb-seq experiment. It records implementation choices, intermediate quantities, exclusions, and numerical protocols that complement the description in the main article and facilitate reproducibility.
+
+The analysis is designed to instantiate the conditional integral sparse reconstruction framework of Algorithm~5.1 in the main article. In particular, the real-data pipeline must produce estimated unspliced trajectories, estimated regulator trajectories, gene-specific kinetic parameters, perturbation operators, integration intervals, and a regularization parameter, after which the integral response and design matrix are constructed and the sparse regulatory coefficients are estimated. All biological conclusions below are therefore conditional on the upstream trajectory and kinetic estimates.
+
+\section{Dataset and processed input}
+
+The real-data experiment uses the Replogle et al.\ RPE1 CRISPRi Perturb-seq dataset together with the VeloCycle-processed representation. The processed single-cell object contains 167,119 cells and 36,601 genes. Perturbation identity is stored at the cell level, including the perturbation target and guide information. Separate spliced and unspliced count layers are available, which is essential for applying the integral RNA-velocity reconstruction rather than only a static perturbation-response analogue.
+
+The VeloCycle processing provides a cell-cycle phase estimate for each cell, condition-specific cell-cycle speed information, and gene-specific kinetic parameters for a set of 426 genes. The phase variable is treated as a latent biological coordinate rather than laboratory clock time. No cell is observed longitudinally; the trajectories used below are reconstructed by aggregating snapshot cells over the inferred latent cell-cycle phase.
+
+\section{Condition and cell filtering}
+
+The VeloCycle-processed RPE1 dataset contains a substantially larger perturbation panel than the one used in the final reconstruction. The complete processed object contains 985 measured perturbation targets. The final analysis retains 151 perturbation targets together with the non-targeting control, giving 152 experimental conditions and approximately 57,172 retained cells. All trajectory construction, identifiability calculations, sparse reconstructions, stability analyses, and held-out evaluations reported below use this fixed condition set.
+
+The exact upstream perturbation- and cell-level quality-control criteria used to obtain the final 151-target panel should be preserved together with the original preprocessing workflow. The numerical record available for the present supplement identifies the final panel and retained cell set but does not by itself recover every upstream filtering rule with sufficient certainty to state those rules here without qualification.
+
+% TODO before final archival release, if the original preprocessing notebook is recovered:
+% record the exact perturbation- and cell-level QC criteria used to obtain
+% the final 151-target panel from the full 985-target processed dataset.
+
+\section{Final analysis population}
+
+The response-gene set consists of the 426 genes for which the VeloCycle representation and kinetic information are available. The candidate-regulator set consists of the 151 retained perturbation targets.
+
+Only 12 genes belong to both sets:
+\[
+\{\mathrm{ARL2},\mathrm{BCL2L1},\mathrm{CCNK},\mathrm{CLOCK},\mathrm{PMF1},\mathrm{PPP6C},\mathrm{PTEN},\mathrm{RRM2},\mathrm{SPC25},\mathrm{TACC3},\mathrm{TFDP1},\mathrm{WTAP}\}.
+\]
+These overlap genes require special treatment because their own perturbation directly affects the response gene and because the same measured quantity would otherwise enter both sides of the reconstruction.
+
+\section{Perturbation representation}
+
+For the non-targeting control, the perturbation operator is the identity. For a retained perturbation targeting regulator \(r\), the corresponding regulator coordinate is treated as completely suppressed in the perturbation operator \(M_q\). This choice is specific to the retained VeloCycle-filtered RPE1 cells: within the analyzed perturbed cells, the target-gene spliced and unspliced counts are zero after the upstream filtering. It should not be interpreted as a general statement that CRISPRi always produces complete knockdown.
+
+The direct intervention term \(h_g(q)\) is not independently known for a response gene \(g\) under its own direct perturbation. Consequently, when a response gene is also one of the 151 perturbed regulators, equations from the condition \(q=g\) are excluded from the reconstruction of that response gene. Self-regulatory predictors for these 12 overlap genes are also excluded from the primary network reconstruction to avoid same-source confounding.
+
+\section{Latent phase discretization}
+
+The VeloCycle cell-cycle phase is represented on the circular interval \([0,1)\). The phase domain is divided into 10 equal bins with centers
+\[
+0.05,\ 0.15,\ 0.25,\ 0.35,\ 0.45,\ 0.55,\ 0.65,\ 0.75,\ 0.85,\ 0.95.
+\]
+
+A condition--phase bin is considered usable when it contains at least five cells. Across 152 conditions and 10 bins, 1,438 of the 1,520 possible condition--bin pairs satisfy this criterion, corresponding to 94.605\% coverage. Adjacent usable phase-bin pairs define the integration intervals used in the empirical inverse problem. The final number of usable adjacent-phase integral equations is
+\[
+M=1214.
+\]
+
+\section{Response-gene trajectories}
+
+For each of the 426 response genes, the phase-resolved spliced trajectory is constructed by combining the canonical VeloCycle phase-dependent profile with a condition-specific amplitude derived from raw spliced expression relative to the non-targeting control. The resulting response-trajectory array has dimension
+\[
+152\times10\times426,
+\]
+corresponding to condition, phase bin, and response gene.
+
+Conceptually, the construction can be written as
+\[
+\widehat s_g^{(q)}(t)
+=
+\mathcal{T}_g\!\left(t;\,\text{VeloCycle phase profile},\,a_g^{(q)}\right),
+\]
+where \(a_g^{(q)}\) denotes the condition-specific non-targeting-relative expression amplitude and \(\mathcal{T}_g\) denotes the trajectory construction used in the final preprocessing workflow. In the implemented analysis, this amplitude is based on the condition-specific raw-spliced log-fold-change relative to the non-targeting condition.
+
+The corresponding unspliced response trajectory is derived using the VeloCycle kinetic parameters and condition-specific phase-speed representation so that the spliced and unspliced trajectories are internally consistent with the fitted RNA-velocity dynamics. Thus, the response-side construction shares a common VeloCycle-derived phase structure across conditions with condition-specific amplitude modulation. This feature is important for interpreting the phase-only validation baseline because part of the response representation is itself strongly phase structured.
+
+The retained numerical record establishes the trajectory dimensions, the VeloCycle phase profile, the non-targeting-relative amplitude construction, and the kinetic consistency of the unspliced trajectory. If the original preprocessing implementation is recovered, the exact transformation defining \(a_g^{(q)}\), including any pseudocount and normalization constants, should be archived together with this supplement rather than reconstructed from memory.
+
+% TODO before final archival release, if the original preprocessing notebook is recovered:
+% insert the exact formula for the NT-relative raw-spliced log-fold-change
+% amplitude, including pseudocount/normalization constants, and the exact
+% algebraic formula used to obtain the unspliced trajectory from the
+% VeloCycle kinetic and phase-speed quantities.
+
+\section{Regulator trajectories}
+
+The 151 regulator trajectories are constructed separately from the raw spliced counts. For each perturbation condition and each regulator, phase-resolved expression is estimated on the same 10-bin circular phase grid. A one-harmonic circular smoother is used to obtain a smooth phase trajectory. In generic form, the fitted phase dependence is represented by
+\[
+f(t)=a_0+a_1\cos(2\pi t)+b_1\sin(2\pi t),
+\]
+with coefficients estimated separately for the relevant condition--regulator combination. The direct target coordinate is then forced to zero for the corresponding perturbation condition, consistent with the perturbation operator described above.
+
+The final regulator-trajectory array has dimension
+\[
+152\times10\times151.
+\]
+
+These regulator trajectories are used to construct the integrated regulatory features in the design matrix. They are estimated for both training and held-out perturbation conditions in the conditional validation described below; therefore, the held-out experiment is not an intervention-only prediction from perturbation identity alone.
+
+\section{Kinetic parameters}
+
+The integral transcription equation for target gene \(g\) uses the splicing-rate parameter \(\beta_g\). The degradation parameter \(\gamma_g\) is not required explicitly in the integral response because the reconstruction is based on the unspliced equation
+\[
+\dot u_g^{(q)}(t)=c_g+h_g(q)+A_{g\cdot}M_qs_R^{(q)}(t)-\beta_g u_g^{(q)}(t).
+\]
+The VeloCycle kinetic estimates are used upstream to construct the phase-resolved dynamical representation. Any error in these kinetic estimates should be interpreted as part of the effective model error in the empirical inverse problem.
+
+\section{Integral response and design matrix}
+
+For an adjacent usable phase interval \([t_a,t_b]\) in condition \(q\), the empirical integral response for gene \(g\) is
+\[
+\widehat y_g^{(q)}(t_a,t_b)
+=
+\widehat u_g^{(q)}(t_b)-\widehat u_g^{(q)}(t_a)
++\widehat\beta_g\int_{t_a}^{t_b}\widehat u_g^{(q)}(t)\,dt
+-\int_{t_a}^{t_b}h_g(q)\,dt.
+\]
+
+The corresponding feature vector is
+\[
+\widehat x^{(q)}(t_a,t_b)
+=
+\begin{pmatrix}
+t_b-t_a\\[2mm]
+\displaystyle \int_{t_a}^{t_b}M_q\widehat s_R^{(q)}(t)\,dt
+\end{pmatrix}
+\in\mathbb{R}^{152}.
+\]
+
+The first column is the unpenalized basal-transcription feature and the remaining 151 columns correspond to candidate regulators. Adjacent-bin integrals are evaluated exactly for the chosen phase-trajectory representation rather than by numerical differentiation.
+
+After stacking all usable condition--interval pairs, the common design matrix has dimension
+\[
+X_{\mathrm{final}}\in\mathbb{R}^{1214\times152},
+\]
+and the response matrix has dimension
+\[
+Y_{\mathrm{final}}\in\mathbb{R}^{1214\times426}.
+\]
+
+For the 12 overlap genes, rows corresponding to the gene's own perturbation are removed from that gene-specific regression because \(h_g(q)\) is unknown there.
+
+\section{Sparse estimator and preprocessing}
+
+Each response gene is reconstructed with an \(\ell_1\)-penalized linear inverse problem with an unpenalized basal-transcription coefficient. The implementation uses a Frisch--Waugh--Lovell residualization step for the basal column. No ordinary mean-centering is applied to the dynamical features. After removal of the basal contribution, regulatory columns and the response are scaled by their root-mean-square magnitudes. The Lasso is then fitted with \texttt{fit\_intercept=False}.
+
+The global regularization parameter used for the primary integral reconstruction is
+\[
+\lambda=0.03665241237079626.
+\]
+
+For the primary network, self-regulatory predictors are removed for the 12 response/regulator overlap genes as described above.
+
+\section{Regularization calibration}
+
+A common regularization level is used across the primary reconstruction and the downstream stability and held-out analyses. Thirty-one response genes are reserved for regularization calibration and are excluded from the primary 395-gene held-out validation summary. The selected regularization level is
+\[
+\lambda=0.03665241237079626.
+\]
+
+The retained numerical record establishes the final calibration-gene count and selected regularization value but does not contain sufficient information to reconstruct with certainty the complete candidate-\(\lambda\) grid and selection criterion used in the original calibration step. These details should be recovered from the original calibration workflow if an exact end-to-end rerun is required.
+
+% TODO before final archival release, if the original calibration notebook is recovered:
+% record the identities/selection rule for the 31 calibration genes,
+% the candidate lambda grid, the validation criterion, and the rule used
+% to select lambda = 0.03665241237079626.
+
+\section{Primary reconstructed network}
+
+The primary regulatory matrix has dimension
+\[
+426\times151.
+\]
+Among the 64,326 possible response--regulator pairs, 15,247 coefficients are nonzero in the full-data reconstruction, corresponding to a network density of 23.70\%.
+
+This density should be described as an \(\ell_1\)-regularized sparse reconstruction, but not as an extremely sparse network. Selection of an edge in the full-data fit is not treated as evidence of biological truth; the stability analysis below evaluates only robustness of the inverse reconstruction to changes in the perturbation panel.
+
+\section{Empirical identifiability and conditioning}
+
+Using all 152 conditions, the scaled empirical integral design has rank
+\[
+\operatorname{rank}(X_{\mathrm{final}})=152,
+\]
+so the complete design is full rank. The smallest eigenvalue of the scaled information matrix is
+\[
+\lambda_{\min}=0.00267429148,
+\]
+and the corresponding condition number is approximately
+\[
+5.22699\times10^4.
+\]
+
+To characterize how rank and conditioning develop with perturbational diversity, 100 random orderings of the 151 perturbation conditions are generated while the non-targeting control is retained throughout. The empirical design is recomputed along each ordering. The first perturbation count at which full rank is attained has mean 41.86, median 42, minimum 40, and maximum 44.
+
+Representative median values along the perturbation path are summarized in Table~\ref{tab:identifiability-path}.
+
+\begin{table}[htbp]
+\footnotesize
+\caption{Representative values along the randomized perturbation-addition path. The non-targeting control is retained throughout.}
+\label{tab:identifiability-path}
+\begin{center}
+\begin{tabular}{rccc}
+\toprule
+Perturbations & Rank & Fraction full rank & Median \(\lambda_{\min}\) \\
+\midrule
+0   & 7   & 0.00 & --- \\
+5   & 29  & 0.00 & --- \\
+10  & 47  & 0.00 & --- \\
+20  & 81  & 0.00 & --- \\
+30  & 114 & 0.00 & --- \\
+40  & 148 & 0.03 & --- \\
+50  & 152 & 1.00 & \(7\times10^{-6}\) \\
+60  & 152 & 1.00 & \(1.68\times10^{-4}\) \\
+80  & 152 & 1.00 & \(7.52\times10^{-4}\) \\
+100 & 152 & 1.00 & \(1.346\times10^{-3}\) \\
+120 & 152 & 1.00 & \(1.926\times10^{-3}\) \\
+151 & 152 & 1.00 & \(2.674\times10^{-3}\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+The intended interpretation is that the empirical design reaches structural full rank as perturbational diversity increases and then continues to improve in practical conditioning. This is consistent with the identifiability mechanism in the main article but is not a proof that the inferred biological network is correct.
+
+\section{Perturbation-condition subsampling stability}
+
+Network stability is assessed over 100 independent repetitions. In each repetition, a random 80\% subset of the perturbation conditions is retained and the non-targeting control is always included. The same integral reconstruction procedure and global regularization parameter are used.
+
+Among edges selected in the full-data reconstruction, 8,616 have selection frequency at least \(0.8\), 6,381 have selection frequency at least \(0.9\), 5,157 have selection frequency at least \(0.95\), and 2,999 are selected in every subsample. Thus, 56.5\% of the full-data selected edges are recovered in at least 80\% of the perturbation-condition subsamples. Among edges with selection frequency at least \(0.8\), the mean sign agreement is approximately \(0.9419\) and the median sign agreement is \(0.97\).
+
+These quantities measure robustness to perturbation-panel subsampling. They should not be interpreted as ground-truth edge accuracy.
+
+\section{Held-out condition validation}
+
+A separate five-fold condition-held-out analysis evaluates whether the reconstructed inverse relation generalizes to perturbation conditions excluded from fitting. The non-targeting condition is always retained in the training set. The 31 response genes used for regularization calibration are excluded from the primary held-out summary, leaving 395 non-calibration response genes.
+
+Within each fold, all preprocessing needed for the penalized regression, including Frisch--Waugh--Lovell residualization and root-mean-square scaling, is estimated from the training conditions only. The regularization parameter is kept fixed at the globally chosen value. The resulting regulatory coefficients are then used to predict the integral responses in the held-out conditions conditional on the estimated regulator trajectories for those held-out conditions.
+
+This validation should therefore be described as \emph{conditional equation prediction}. It is not an end-to-end holdout of the raw single-cell processing pipeline, because the VeloCycle latent representation was estimated upstream using the broader dataset, held-out regulator trajectories are available at prediction time, and the response trajectory construction uses condition-specific observed expression information. It is also not a prediction of the future state of an individual cell.
+
+\section{Phase-only baseline}
+
+Because the RPE1 trajectories exhibit strong shared cell-cycle structure, the held-out GRN prediction is compared with a phase-only baseline. The phase-only model captures response variation associated with cell-cycle phase without using the reconstructed regulatory matrix \(A\). Its purpose is to test whether the regulatory reconstruction contributes predictive information beyond the dominant shared phase trajectory.
+
+Across the 395 non-calibration response genes, the mean conventional held-out coefficients of determination are
+\[
+R^2_{\mathrm{GRN}}=0.716010,
+\qquad
+R^2_{\mathrm{phase}}=0.756898.
+\]
+The GRN model outperforms the phase-only baseline for 30.3797\% of the evaluation genes.
+
+The incremental score used in the main article is
+\[
+\Delta R^2_{\mathrm{phase}}
+=
+1-\frac{\operatorname{SSE}_{\mathrm{GRN}}}{\operatorname{SSE}_{\mathrm{phase}}},
+\]
+where positive values indicate improvement over the phase-only baseline. Across the 395 evaluation genes, the mean incremental score is approximately \(-0.8928\), the median is approximately \(-0.1573\), the fraction with positive incremental score is approximately \(0.3038\), the fraction with score at least \(0.05\) is approximately \(0.2329\), and the fraction with score at least \(0.10\) is approximately \(0.1595\).
+
+The incremental score is strongly negatively associated with phase-only predictability:
+\[
+\rho_{\mathrm{Spearman}}=-0.819236.
+\]
+Among the 58 genes with \(R^2_{\mathrm{phase}}\geq0.95\), the GRN model does not outperform the phase-only baseline for any gene.
+
+If these 58 strongly phase-dominated genes are removed, 337 genes remain. All 120 genes for which the GRN outperforms phase in the full 395-gene evaluation are contained in this remaining set, giving a GRN win fraction of
+\[
+120/337\approx35.6\%.
+\]
+The mean incremental score for this restricted set was previously estimated to be approximately \(-0.34\) from aggregate summaries rather than recomputed directly from the per-gene validation table. This value should therefore be treated as approximate unless the original per-gene output is recovered and the statistic is recomputed directly.
+
+\section{Interpretation of the held-out results}
+
+The held-out analysis does not show broad predictive superiority of the reconstructed GRN over the phase-only baseline. Instead, it shows heterogeneous additional predictive value. The main empirical pattern is that GRN advantage decreases as phase-only predictability increases. The most direct interpretation is that strong shared cell-cycle structure dominates the response for many genes, while condition-specific regulatory variation provides additional information only for a subset.
+
+Other plausible contributors include limited perturbation-specific variation in regulator trajectories, error in latent phase and kinetic parameters, \(\ell_1\)-regularization bias, and misspecification of the linear transcription model. The current evidence does not identify any one of these mechanisms as the unique cause.
+
+The response-trajectory construction itself shares a common VeloCycle-derived phase shape across conditions, which can favor a strong phase-only baseline. This should be treated as a limitation of the present real-data representation rather than as a reason to interpret the phase-only result as a purely biological effect.
+
+\section{Shared versus condition-specific regulator variation}
+
+A decomposition of the regulator trajectories into shared phase structure and condition-specific deviations indicates that the regulator design is also strongly phase structured. The global ratio of condition-specific deviation RMS to total regulator-trajectory RMS is approximately
+\[
+0.1620,
+\]
+and the median condition-level deviation ratio is approximately
+\[
+0.09566.
+\]
+These values support the interpretation that most regulator variation follows a shared phase trajectory, leaving comparatively modest condition-specific deviations for the GRN to exploit in held-out prediction.
+
+\section{Claims supported by the real-data analysis}
+
+The strongest supported real-data claim is that increasing perturbational diversity restores empirical full rank and improves conditioning of the integral inverse problem, in qualitative agreement with the main article's identifiability theory. A second supported claim is that the \(\ell_1\)-regularized integral reconstruction contains a substantial core of edges that is stable under perturbation-condition subsampling. A third supported claim is that predictive generalization is heterogeneous and is limited for strongly phase-dominated genes.
+
+The analysis does \emph{not} establish that the reconstructed network is the biological ground-truth GRN, that individual stable edges are necessarily true regulatory interactions, or that the GRN model generally outperforms a phase-only predictor. The conceptual hierarchy to retain is
+\[
+\text{identifiable}
+\;\not\Rightarrow\;
+\text{stable}
+\;\not\Rightarrow\;
+\text{predictively superior}
+\;\not\Rightarrow\;
+\text{biologically true}.
+\]
+
+\section{Mapping to the manuscript model}
+
+The relationship between the implementation and the manuscript notation is summarized in Table~\ref{tab:rpe1-notation-map}.
+
+\begin{table}[htbp]
+\footnotesize
+\caption{Mapping between the manuscript notation and the RPE1 real-data implementation.}
+\label{tab:rpe1-notation-map}
+\begin{center}
+\begin{tabular}{p{0.24\textwidth}p{0.66\textwidth}}
+\toprule
+Manuscript quantity & Real-data construction \\
+\midrule
+\(\widehat u_g^{(q)}(t)\) & VeloCycle-consistent phase-resolved unspliced trajectory for response gene \(g\) in condition \(q\). \\
+\(\widehat s_R^{(q)}(t)\) & Phase-resolved regulator trajectories constructed from raw spliced counts with one-harmonic circular smoothing. \\
+\(\widehat\beta_g\) & VeloCycle splicing-rate estimate for response gene \(g\). \\
+\(M_q\) & Identity for the non-targeting control; target coordinate suppressed for the corresponding retained CRISPRi perturbation. \\
+\(h_g(q)\) & Treated as unavailable for direct self-perturbation; corresponding equations are excluded for the 12 overlap genes. \\
+\([t_a,t_b]\) & Adjacent usable bins on the 10-bin VeloCycle phase grid. \\
+\(\widehat X\) & 1,214-row integral design with one basal column and 151 regulator columns. \\
+\(\widehat y_g\) & Integral unspliced response \(\Delta u+\widehat\beta_g\int u-\int h_g\). \\
+\(\lambda\) & Global Lasso parameter \(0.03665241237079626\). \\
+\(\widehat A\) & \(426\times151\) reconstructed regulatory matrix. \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Reproducibility checklist}
+
+For any future rerun, verify the following before comparing results with the numbers in this supplement:
+\begin{enumerate}
+\item The same VeloCycle-processed RPE1 object and the same cell-level quality-control filters are being used.
+\item The final condition set contains 151 perturbations plus the non-targeting control.
+\item The response set contains 426 VeloCycle genes and the regulator set contains the same 151 perturbation targets.
+\item The 10-bin circular phase discretization and the minimum five-cells-per-condition-bin criterion are unchanged.
+\item The final number of usable adjacent-phase intervals is 1,214.
+\item The 12 response/regulator overlap genes receive the same direct-perturbation row exclusions and self-predictor exclusions.
+\item Regulator trajectories are reconstructed from raw spliced counts with the same one-harmonic circular smoother and target-suppression rule.
+\item Response trajectories use the same VeloCycle phase shape, condition-specific non-targeting-relative amplitude construction, kinetic parameters, and phase-speed representation.
+\item The same Frisch--Waugh--Lovell handling of the basal column, RMS scaling, and no-centering convention are used.
+\item The Lasso regularization parameter is \(0.03665241237079626\).
+\item Stability uses 100 random 80\% perturbation-condition subsamples with the non-targeting control always retained.
+\item Held-out validation uses five perturbation-condition folds, training-only regression preprocessing, the non-targeting control always in training, and excludes the 31 regularization-calibration genes from the primary 395-gene summary.
+\item The validation is interpreted as conditional equation prediction rather than an end-to-end raw-data holdout or longitudinal single-cell prediction.
+\item Reported real-data claims remain restricted to empirical identifiability, reconstruction stability, and conditional held-out generalization rather than ground-truth edge validation.
+\end{enumerate}
+
+% Uncomment these lines if citations are added directly to the supplement.
+% \bibliographystyle{siamplain}
+% \bibliography{references}
+
+\end{document}

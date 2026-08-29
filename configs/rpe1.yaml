@@ -1,0 +1,75 @@
+# Frozen parameters from Replogle_cloud.ipynb
+data_qc:
+  min_cells_per_perturbation: 150
+  min_mean_spliced_control: 0.1
+  min_mean_unspliced_control: 0.02
+
+phase:
+  n_bins: 10
+  min_cells_per_bin: 5
+  min_usable_bins_per_condition: 7
+
+response_trajectory:
+  nt_logfc_pseudocount: 0.1
+
+reconstruction:
+  alpha: 0.03665241237079626
+  fit_intercept: false
+  fwl_basal_column: true
+  rms_scaling: true
+  ordinary_mean_centering: false
+  lasso_max_iter: 20000
+  lasso_tol: 1.0e-6
+
+alpha_calibration:
+  n_folds: 5
+  random_state: 2026
+  grid_min_power10: -4
+  grid_max_power10: 0
+  grid_size: 40
+  genes:
+    - CDKN1B
+    - MLH1
+    - THOC1
+    - BCL7C
+    - EXOC6
+    - MAP3K20
+    - UCHL5
+    - CAMK2G
+    - TXLNG
+    - CSNK2A2
+    - KIF22
+    - DSN1
+    - FANCI
+    - DNA2
+    - NCAPH
+    - PPP6C
+    - NCAPD2
+    - RMI1
+    - KMT2E
+    - VPS4B
+    - TACC3
+    - CACUL1
+    - TFDP2
+    - CDKN3
+    - CSNK1A1
+    - ERCC6
+    - UBE2B
+    - EXT1
+    - HSP90AB1
+    - PLK2
+    - RPS3
+
+identifiability:
+  random_order_repetitions: 100
+  keep_non_targeting: true
+
+stability:
+  repetitions: 100
+  perturbation_fraction: 0.8
+  keep_non_targeting: true
+
+heldout_validation:
+  n_folds: 5
+  keep_non_targeting_in_training: true
+  exclude_calibration_genes_from_primary_summary: true

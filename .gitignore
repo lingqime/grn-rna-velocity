@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Large single-cell data
+data/**/*.h5ad
+data/**/*.loom
+data/**/*.pkl
+data/**/*.pkl.gz
+
+# Large/intermediate numerical checkpoints
+results/**/*.npz
+results/**/*.npy
+
+# Keep small tables if intentionally added
+# results/**/*.csv
+
+# Generated figures
+figures/**/*.pdf
+figures/**/*.png
+
+# LaTeX build products
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# OS/editors
+.DS_Store
+.vscode/
+.idea/

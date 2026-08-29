@@ -1,0 +1,9 @@
+numpy
+pandas
+scipy
+anndata
+h5py
+scikit-learn
+matplotlib
+psutil
+PyYAML
