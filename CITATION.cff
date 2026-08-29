@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated manuscript and this repository."
+title: "Decoding Gene Regulatory Networks from Single-Cell RNA Velocity"
+type: software
+authors:
+  - family-names: "Meng"
+    given-names: "Lingqi"
+  - family-names: "Wang"
+    given-names: "Shiruo"
+date-released: 2026-08-29
+license: MIT
+repository-code: "https://github.com/lingqime/grn-rna-velocity"
+preferred-citation:
+  type: article
+  title: "Decoding Gene Regulatory Networks from Single-Cell RNA Velocity"
+  authors:
+    - family-names: "Meng"
+      given-names: "Lingqi"
+    - family-names: "Wang"
+      given-names: "Shiruo"

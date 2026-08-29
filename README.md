@@ -160,14 +160,16 @@ The SIAM supplementary-material source is included in `supplement/` and records
 the real-data construction, estimator, identifiability, stability, validation,
 and reproducibility details.
 
-## Before changing this repository from private to public
+## Citation and license
 
-Two metadata decisions are intentionally left to the repository owner rather
-than guessed during code packaging:
+This repository is released under the MIT License. The software copyright is
+held by Lingqi Meng, who wrote the code in this repository.
 
-- choose and add the software license;
-- add the final manuscript citation/author metadata (for example in
-  `CITATION.cff`) once the author list and manuscript identifier are confirmed.
+The associated manuscript is authored by Lingqi Meng and Shiruo Wang, in that
+order. GitHub citation metadata are provided in `CITATION.cff`. A DOI is not
+included yet and can be added later when a preprint, journal article, or
+archived software release receives a persistent identifier.
 
-The unresolved 165 -> 153 condition-selection provenance gap should remain
-disclosed unless the historical checkpoint-generation code is recovered.
+The unresolved 165 -> 153 condition-selection provenance gap remains disclosed
+in `PROVENANCE.md` and should remain so unless the historical
+checkpoint-generation code is recovered.
