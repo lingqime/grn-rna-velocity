@@ -3,12 +3,10 @@
 Code and technical provenance for the perturbation-resolved RPE1 analysis used
 in the manuscript:
 
-**Lingqi Meng and Shiruo Wang, *Decoding Gene Regulatory Networks from
-Single-Cell RNA Velocity*.**  
+**Lingqi Meng and Shiruo Wang, *Decoding gene regulatory networks from
+single-cell RNA velocity*.**  
 arXiv:2608.09722 (2026).  
 https://arxiv.org/abs/2608.09722  
-https://doi.org/10.48550/arXiv.2608.09722
-
 
 ## Reproducibility status
 
