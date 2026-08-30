@@ -1,8 +1,13 @@
 # Decoding Gene Regulatory Networks from Single-Cell RNA Velocity
 
 Code and technical provenance for the perturbation-resolved RPE1 analysis used
-in the manuscript *Decoding Gene Regulatory Networks from Single-Cell RNA
-Velocity*.
+in the manuscript:
+
+**Lingqi Meng and Shiruo Wang, *Decoding Gene Regulatory Networks from
+Single-Cell RNA Velocity*.**  
+arXiv:2608.09722 (2026).  
+https://arxiv.org/abs/2608.09722  
+https://doi.org/10.48550/arXiv.2608.09722
 
 
 ## Reproducibility status
@@ -160,15 +165,30 @@ The SIAM supplementary-material source is included in `supplement/` and records
 the real-data construction, estimator, identifiability, stability, validation,
 and reproducibility details.
 
-## Citation and license
+## Citation
+
+If you use this code or analysis in your work, please cite:
+
+```bibtex
+@article{meng2026decoding,
+  title   = {Decoding Gene Regulatory Networks from Single-Cell RNA Velocity},
+  author  = {Meng, Lingqi and Wang, Shiruo},
+  journal = {arXiv preprint arXiv:2608.09722},
+  year    = {2026},
+  doi     = {10.48550/arXiv.2608.09722},
+  url     = {https://arxiv.org/abs/2608.09722}
+}
+```
+
+GitHub citation metadata are also provided in `CITATION.cff`.
+
+## License
 
 This repository is released under the MIT License. The software copyright is
 held by Lingqi Meng, who wrote the code in this repository.
 
 The associated manuscript is authored by Lingqi Meng and Shiruo Wang, in that
-order. GitHub citation metadata are provided in `CITATION.cff`. A DOI is not
-included yet and can be added later when a preprint, journal article, or
-archived software release receives a persistent identifier.
+order, and is publicly available as arXiv:2608.09722.
 
 The unresolved 165 -> 153 condition-selection provenance gap remains disclosed
 in `PROVENANCE.md` and should remain so unless the historical
